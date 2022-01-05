@@ -7,7 +7,7 @@
 
 
 int main() {
-  int sock = socket(AF_INET, SOCK_STREAM, 0);
+  int sock = socket(AF_INET, SOCK_DGRAM, 0);
 
   struct sockaddr_in server, client = {0};
   server.sin_addr.s_addr = INADDR_ANY;
@@ -16,17 +16,13 @@ int main() {
 
   bind(sock, (struct sockaddr *)&server, sizeof(server));
 
-  listen(sock, 5);
-
-  socklen_t length = sizeof(client);
-  int sock2 = accept(sock, (struct sockaddr *)&client, &length);
-
-  char buffer[256];
-  recv(sock2, buffer, sizeof(buffer), 0);
-  printf("%s\n", buffer);
-
+  for (;;) {
+    char buffer[256];
+    socklen_t length = sizeof(client);
+    recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr *)&client, &length);
+    printf("%s\n", buffer);
+  }
   close(sock);
-  close(sock2);
 
   return 0;
 }
